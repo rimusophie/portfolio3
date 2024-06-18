@@ -1,0 +1,39 @@
+version: '3'
+services:
+  app:
+    container_name: portfolio3
+    build:
+      dockerfile: Dockerfile
+    volumes:
+      - .:/var/www/html
+    ports:
+      - 8080:80
+
+  db:
+    image: mysql:8.0.36
+    container_name: portfolio3_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      #MYSQL_DATABASE: rms_blog
+      #MYSQL_USER: root
+      MYSQL_PASSWORD: root
+      TZ: 'Asia/Tokyo'
+      command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-authentication-plugin=mysql_native_password
+      # MySQL8.0ではデフォルトが"caching_sha2_password"で、ドライバ非対応のため変更
+    volumes:
+      - ./docker/db/data:/var/lib/mysql
+      - ./docker/db/sql:/docker-entrypoint-initdb.d
+    ports:
+      - 3306:3306
+
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: portfolio3_phpmyadmin
+    depends_on:
+      - db
+    environment:
+      #- PMA_HOSTS=mysql
+      - PMA_USER=root
+      - PMA_PASSWORD=root
+    ports:
+      - 3001:80
