@@ -1,14 +1,10 @@
 <?php
-$host = "db";
-$db_name = "portfolio";
-$user = "root";
-$pass = "root";
 
-$pdo = new PDO("mysql:host={$host};dbname={$db_name}", $user, $pass);
+require(__DIR__ . "/../utils/db.php");
+
+$pdo = get_db();
 $result = $pdo->query("SELECT id, name FROM skills");
-foreach($result as $row) {
-    echo $row["name"] . PHP_EOL;
-}
+
 ?>
 <html lang="ja">
 <head>
@@ -28,7 +24,34 @@ foreach($result as $row) {
 <?php 
 include(__DIR__ . "/../includes/header.php");
 ?>
-業務経験
+
+<div class="row mt-3">
+            <div class="col">業務経験</div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col">
+            <table class="common-table">
+                <tr>
+                    <th>免許・資格コード</th>
+                    <th>名称</th>
+                </tr>
+<?php
+                foreach($result as $row) {
+                    echo "<tr>";
+                    echo "<td>";
+                    echo htmlspecialchars($row["id"], ENT_QUOTES, "UTF-8");
+                    echo "</td>";
+                    echo "<td>";
+                    echo htmlspecialchars($row["name"], ENT_QUOTES, "UTF-8");
+                    echo "</td>";
+                    echo"</tr>";
+                }
+?>
+            </table>
+            </div>
+        </div>
+
 <?php 
 include(__DIR__ . "/../includes/footer.php");
 ?>
