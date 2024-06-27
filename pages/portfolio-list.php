@@ -1,14 +1,25 @@
 <?php
-$host = "db";
-$db_name = "portfolio";
-$user = "root";
-$pass = "root";
 
-$pdo = new PDO("mysql:host={$host};dbname={$db_name}", $user, $pass);
-$result = $pdo->query("SELECT id, name FROM skills");
-foreach($result as $row) {
-    echo $row["name"] . PHP_EOL;
-}
+require(__DIR__ . "/../utils/db.php");
+
+$pdo = get_db();
+$sql = "
+    SELECT 
+        p.show_title AS p_show_title, 
+        p.remark AS p_remark, 
+        GROUP_CONCAT(s.name ORDER BY s.id SEPARATOR ',') AS s_name
+    FROM portfolios AS p 
+        LEFT JOIN portfolio_skills AS ps 
+            ON p.id = ps.portfolio_id 
+        LEFT JOIN skills AS s 
+            ON ps.skill_id = s.id
+    GROUP BY
+	    p.id,
+        p.show_title,
+        p.remark
+";
+$result = $pdo->query($sql);
+
 ?>
 <html lang="ja">
 <head>
@@ -28,7 +39,36 @@ foreach($result as $row) {
 <?php 
 include(__DIR__ . "/../includes/header.php");
 ?>
-ポートフォリオ
+        <div class="row mt-3">
+            <div class="col">ポートフォリオ</div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col">
+            <table class="common-table">
+                <tr>
+                    <th>案件</th>
+                    <th>業務経験</th>
+                    <th>感想</th>
+                </tr>
+<?php
+                foreach($result as $row) {
+                    echo "<tr>";
+                    echo "<td>";
+                    echo htmlspecialchars($row["p_show_title"], ENT_QUOTES, "UTF-8");
+                    echo "</td>";
+                    echo "<td>";
+                    echo htmlspecialchars($row["s_name"], ENT_QUOTES, "UTF-8");
+                    echo "</td>";
+                    echo "<td>";
+                    echo htmlspecialchars($row["p_remark"], ENT_QUOTES, "UTF-8");
+                    echo "</td>";
+                    echo"</tr>";
+                }
+?>
+            </table>
+            </div>
+        </div>
 <?php 
 include(__DIR__ . "/../includes/footer.php");
 ?>
